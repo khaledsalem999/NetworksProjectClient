@@ -17,6 +17,12 @@ namespace FileSendClient
 {
     public partial class Form1 : Form
     {
+        public Stream fileStream;
+        public byte[] fileBuffer;
+        public TcpClient clientSocket;
+        public TcpListener Listener;
+        public NetworkStream networkStream;
+
         public Form1()
         {
             InitializeComponent();
@@ -49,6 +55,25 @@ namespace FileSendClient
 
         }
 
-        
+        private void button3_Click(object sender, EventArgs e)
+        {
+            clientSocket = new TcpClient("192.168.1.110", 8080);
+
+            String str = textBox3.Text;
+            Stream stm = clientSocket.GetStream();
+
+            ASCIIEncoding asen = new ASCIIEncoding();
+            byte[] ba = asen.GetBytes(str);
+
+            stm.Write(ba, 0, ba.Length);
+
+            byte[] bb = new byte[100];
+            int k = stm.Read(bb, 0, 100);
+
+            for (int i = 0; i < k; i++)
+                Console.Write(Convert.ToChar(bb[i]));
+
+        }
+
     }
 }
