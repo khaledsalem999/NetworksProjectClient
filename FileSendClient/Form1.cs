@@ -30,16 +30,25 @@ namespace FileSendClient
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Stream fileStream = File.OpenRead(textBox1.Text);
-            // Alocate memory space for the file
-            //hello world 22
-            byte[] fileBuffer = new byte[fileStream.Length];
-            fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
-            // Open a TCP/IP Connection and send the data
-            TcpClient clientSocket = new TcpClient(textBox2.Text, 8080);
-            NetworkStream networkStream = clientSocket.GetStream();
-            networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
-            networkStream.Close();
+            try
+            {
+                Stream fileStream = File.OpenRead(textBox1.Text);
+                // Alocate memory space for the file
+                //hello world 22
+                byte[] fileBuffer = new byte[fileStream.Length];
+                fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
+                // Open a TCP/IP Connection and send the data
+                TcpClient clientSocket = new TcpClient(textBox2.Text, 8080);
+                NetworkStream networkStream = clientSocket.GetStream();
+                networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
+                networkStream.Close();
+            }catch (Exception f)
+            {
+                MessageBox.Show("The target machine is not working");
+            }
+
         }
+
+        
     }
 }
