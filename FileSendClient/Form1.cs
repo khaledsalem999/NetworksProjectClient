@@ -63,7 +63,7 @@ namespace FileSendClient
         }
         private void button3_Click(object sender, EventArgs e)
         {
-
+            this.clientSocket = new TcpClient("127.0.0.1", 8080);
             String str = "COMMAND_AUTH:"+textBox3.Text;
             NetworkStream networkStream = clientSocket.GetStream();
             this.sendString(networkStream, str);
@@ -76,6 +76,7 @@ namespace FileSendClient
         {
             try
             {
+                this.clientSocket = new TcpClient("127.0.0.1", 8080);
                 String str = "COMMAND_LIST";
                 NetworkStream networkStream = clientSocket.GetStream();  //betgeb el stream 3ashan a'dar ab3t ll server
                 this.sendString(networkStream, str);  //send el string 
@@ -109,26 +110,30 @@ namespace FileSendClient
 
         private void startTcp()
         {
-            this.clientSocket = new TcpClient("127.0.0.1", 8080);
         }
 
         private void fileList_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            this.clientSocket = new TcpClient("127.0.0.1", 8080);
             String fileName = fileList.SelectedItem.ToString();
             String cmd = "COMMAND_RECIEVE:"+ fileName;
             NetworkStream networkStream = clientSocket.GetStream();  
             this.sendString(networkStream, cmd);
-            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
-            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
-            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
-            if (!response.StartsWith("UNAUTH"))
+            int thisRead = 0;
+            int blockSize = 1024;
+            Byte[] dataByte = new Byte[blockSize];
+            lock (this)
             {
-                Stream fileStream = File.OpenWrite(@"C:\Users\user\networks2\"+ fileName);
-                fileStream.Write(bytesToRead, 0, bytesRead);
-                fileStream.Flush();
+                Stream fileStream = File.OpenWrite(@"C:\Users\user\networks2\" + fileName);
+                while (true)
+                {
+                    thisRead = networkStream.Read(dataByte, 0, blockSize);
+                    fileStream.Write(dataByte, 0, thisRead);
+                    if (thisRead == 0) break;
+                }
                 fileStream.Close();
             }
+            return;
         }
     }
 }
