@@ -44,36 +44,91 @@ namespace FileSendClient
                 byte[] fileBuffer = new byte[fileStream.Length];
                 fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
                 // Open a TCP/IP Connection and send the data
-                TcpClient clientSocket = new TcpClient(textBox2.Text, 8080);
                 NetworkStream networkStream = clientSocket.GetStream();
                 networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
-                networkStream.Close();
-            }catch (Exception f)
+                byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+                int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+                string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+            }
+            catch (Exception f)
             {
                 MessageBox.Show("The target machine is not working");
             }
-
+            networkStream.Close();
         }
-
+        public void sendString(NetworkStream ns, string str)
+        {
+            byte[] buffer = Encoding.ASCII.GetBytes(str);
+            ns.Write(buffer, 0, buffer.Length);
+        }
         private void button3_Click(object sender, EventArgs e)
         {
-            clientSocket = new TcpClient("192.168.1.110", 8080);
 
-            String str = textBox3.Text;
-            Stream stm = clientSocket.GetStream();
-
-            ASCIIEncoding asen = new ASCIIEncoding();
-            byte[] ba = asen.GetBytes(str);
-
-            stm.Write(ba, 0, ba.Length);
-
-            byte[] bb = new byte[100];
-            int k = stm.Read(bb, 0, 100);
-
-            for (int i = 0; i < k; i++)
-                Console.Write(Convert.ToChar(bb[i]));
-
+            String str = "COMMAND_AUTH:"+textBox3.Text;
+            NetworkStream networkStream = clientSocket.GetStream();
+            this.sendString(networkStream, str);
+            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                String str = "COMMAND_LIST";
+                NetworkStream networkStream = clientSocket.GetStream();  //betgeb el stream 3ashan a'dar ab3t ll server
+                this.sendString(networkStream, str);  //send el string 
+                byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];  //brecieve 
+                int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+                string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+                if (!response.StartsWith("UNAUTH"))
+                {
+                    string[] files = response.Split(',');
+                    foreach (var item in files)
+                    {
+                        fileList.Items.Add(item);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("please authorize first");
+                }
+            }
+            catch (Exception f)
+            {
+                MessageBox.Show("The target machine is not working");
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Thread t = new Thread(new ThreadStart(startTcp));
+            t.Start();
+        }
+
+        private void startTcp()
+        {
+            this.clientSocket = new TcpClient("127.0.0.1", 8080);
+        }
+
+        private void fileList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            String fileName = fileList.SelectedItem.ToString();
+            String cmd = "COMMAND_RECIEVE:"+ fileName;
+            NetworkStream networkStream = clientSocket.GetStream();  
+            this.sendString(networkStream, cmd);
+            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+            if (!response.StartsWith("UNAUTH"))
+            {
+                Stream fileStream = File.OpenWrite(@"C:\Users\user\networks2\"+ fileName);
+                fileStream.Write(bytesToRead, 0, bytesRead);
+                fileStream.Flush();
+                fileStream.Close();
+            }
+        }
     }
 }
