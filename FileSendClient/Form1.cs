@@ -74,13 +74,20 @@ namespace FileSendClient
         }
         private void button3_Click(object sender, EventArgs e)
         {
-            this.clientSocket = new TcpClient(textBox2.Text, 8080);
-            String str = "COMMAND_AUTH:"+textBox3.Text;
-            NetworkStream networkStream = clientSocket.GetStream();
-            this.sendString(networkStream, str);
-            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
-            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
-            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+            try
+            {
+                this.clientSocket = new TcpClient(textBox2.Text, 8080);
+                String str = "COMMAND_AUTH:" + textBox3.Text;
+                NetworkStream networkStream = clientSocket.GetStream();
+                this.sendString(networkStream, str);
+                byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+                int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+                string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+            }
+            catch(Exception f)
+            {
+                MessageBox.Show("Target machine is not running");
+            }
         }
 
         private void button4_Click(object sender, EventArgs e)
