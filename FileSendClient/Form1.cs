@@ -125,7 +125,7 @@ namespace FileSendClient
             Byte[] dataByte = new Byte[blockSize];
             lock (this)
             {
-                Stream fileStream = File.OpenWrite(@"C:\Users\user\networks2\" + fileName);
+                Stream fileStream = File.OpenWrite(@"C:\Users\Khaled\Desktop\Recievefiles\" + fileName);
                 while (true)
                 {
                     thisRead = networkStream.Read(dataByte, 0, blockSize);
@@ -135,6 +135,39 @@ namespace FileSendClient
                 fileStream.Close();
             }
             return;
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            this.clientSocket = new TcpClient("127.0.0.1", 8080);
+            String str = "SHUT_DOWN";
+            NetworkStream networkStream = clientSocket.GetStream();
+            this.sendString(networkStream, str);
+            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            this.clientSocket = new TcpClient("127.0.0.1", 8080);
+            String str = "LOG_OFF";
+            NetworkStream networkStream = clientSocket.GetStream();
+            this.sendString(networkStream, str);
+            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            this.clientSocket = new TcpClient("127.0.0.1", 8080);
+            String str = "RESTART";
+            NetworkStream networkStream = clientSocket.GetStream();
+            this.sendString(networkStream, str);
+            byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+            int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+            string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
         }
     }
 }
