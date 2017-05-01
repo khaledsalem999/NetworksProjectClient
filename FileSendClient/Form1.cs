@@ -40,7 +40,8 @@ namespace FileSendClient
             {
                 Stream fileStream = File.OpenRead(textBox1.Text);
                 // Alocate memory space for the file
-                //hello world 22
+
+               // String cmd = "COMMAND_SEND:" + fileName;
                 byte[] fileBuffer = new byte[fileStream.Length];
                 fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
                 // Open a TCP/IP Connection and send the data
