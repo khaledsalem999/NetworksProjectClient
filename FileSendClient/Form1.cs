@@ -77,6 +77,7 @@ namespace FileSendClient
                         fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
                         networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
                         networkStream.Close();
+                        MessageBox.Show("file " + fileName + " has been sent");
                     }
                     else
                     {
@@ -200,6 +201,7 @@ namespace FileSendClient
                         byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                         int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                         string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+                        MessageBox.Show(response);
                     }
                     catch (Exception t)
                     {
