@@ -179,7 +179,7 @@ namespace FileSendClient
                     Byte[] dataByte = new Byte[blockSize];
                     lock (this)
                     {
-                        Stream fileStream = File.OpenWrite(@"C:\Users\Khaled\networks2\" + fileName);
+                        Stream fileStream = File.OpenWrite(@"C:\Users\user\networks2\" + fileName);
                         while (true)
                         {
                             thisRead = networkStream.Read(dataByte, 0, blockSize);
@@ -325,6 +325,11 @@ namespace FileSendClient
             {
                 MessageBox.Show("Target machine is not running");
             }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
