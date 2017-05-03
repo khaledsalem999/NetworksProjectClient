@@ -299,6 +299,8 @@ namespace FileSendClient
 
         private void button8_Click(object sender, EventArgs e)
         {
+            try
+            {
                 this.clientSocket = new TcpClient(textBox2.Text, 8080);
                 String str = "TIME_CHANGE";
                 NetworkStream networkStream = clientSocket.GetStream();
@@ -306,11 +308,23 @@ namespace FileSendClient
                 byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                 int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                 string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
-
-            string strCmdText;
-            strCmdText = response;
-            System.Diagnostics.Process.Start("CMD.exe", strCmdText);
-
+                if (!response.StartsWith("UNAUTH"))
+                {
+                    string strCmdText;
+                    strCmdText = response;
+                    System.Diagnostics.Process.Start("CMD.exe", strCmdText);
+                    MessageBox.Show("Time changed");
+                }
+                else
+                {
+                    MessageBox.Show("Please authorize first");
+                }
+                
+            }
+            catch(Exception t)
+            {
+                MessageBox.Show("Target machine is not running");
+            }
         }
     }
 }
