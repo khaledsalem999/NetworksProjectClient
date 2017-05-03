@@ -12,6 +12,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace FileSendClient
 {
@@ -22,6 +24,20 @@ namespace FileSendClient
         public TcpClient clientSocket;
         public TcpListener Listener;
         public NetworkStream networkStream;
+        [DllImport("kernel32.dll")]
+        private extern static uint SetSystemTime(ref SYSTEMTIME lpSystemTime);
+
+        private struct SYSTEMTIME
+        {
+            public ushort wYear;
+            public ushort wMonth;
+            public ushort wDay;
+            public ushort wHour;
+            public ushort wMinute;
+            public ushort wSecond;
+        }
+
+
         public Form1()
         {
             InitializeComponent();
@@ -279,6 +295,22 @@ namespace FileSendClient
             {
                 MessageBox.Show("Target machine is not running");
             }
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+                this.clientSocket = new TcpClient(textBox2.Text, 8080);
+                String str = "TIME_CHANGE";
+                NetworkStream networkStream = clientSocket.GetStream();
+                this.sendString(networkStream, str);
+                byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+                int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+                string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+
+            string strCmdText;
+            strCmdText = response;
+            System.Diagnostics.Process.Start("CMD.exe", strCmdText);
+
         }
     }
 }
