@@ -35,35 +35,42 @@ namespace FileSendClient
 
         private void button2_Click(object sender, EventArgs e)
         {
-            try
+            if(String.IsNullOrEmpty(textBox1.Text))
             {
-                this.clientSocket = new TcpClient(textBox2.Text, 8080);
-                Stream fileStream = File.OpenRead(textBox1.Text);
-                // Alocate memory space for the file
-                String fileName = Path.GetFileName(textBox1.Text);
-                String cmd = "COMMAND_SEND:" + fileName;
-                NetworkStream networkStream = clientSocket.GetStream();
-                this.sendString(networkStream, cmd);
-                byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
-                int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
-                string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
-                if (response == "COMMAND_SEND_ACKNOWLEGED")
-                {
-                    // Open a TCP/IP Connection and send the data
-                    // NetworkStream networkStream = clientSocket.GetStream();
-                    byte[] fileBuffer = new byte[fileStream.Length];
-                    fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
-                    networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
-                    networkStream.Close();
-                }
-                else
-                {
-                    MessageBox.Show("Please Auth first");
-                }
+                MessageBox.Show("Nothing to send");
             }
-            catch (Exception f)
+            else
             {
-                MessageBox.Show("The target machine is not working");
+                try
+                {
+                    this.clientSocket = new TcpClient(textBox2.Text, 8080);
+                    Stream fileStream = File.OpenRead(textBox1.Text);
+                    // Alocate memory space for the file
+                    String fileName = Path.GetFileName(textBox1.Text);
+                    String cmd = "COMMAND_SEND:" + fileName;
+                    NetworkStream networkStream = clientSocket.GetStream();
+                    this.sendString(networkStream, cmd);
+                    byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
+                    int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
+                    string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+                    if (response == "COMMAND_SEND_ACKNOWLEGED")
+                    {
+                        // Open a TCP/IP Connection and send the data
+                        // NetworkStream networkStream = clientSocket.GetStream();
+                        byte[] fileBuffer = new byte[fileStream.Length];
+                        fileStream.Read(fileBuffer, 0, (int)fileStream.Length);
+                        networkStream.Write(fileBuffer, 0, fileBuffer.GetLength(0));
+                        networkStream.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please Auth first");
+                    }
+                }
+                catch (Exception f)
+                {
+                    MessageBox.Show("The target machine is not working");
+                }
             }
             
         }
@@ -83,6 +90,7 @@ namespace FileSendClient
                 byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                 int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                 string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+                MessageBox.Show(response);
             }
             catch(Exception f)
             {
@@ -155,7 +163,7 @@ namespace FileSendClient
                     Byte[] dataByte = new Byte[blockSize];
                     lock (this)
                     {
-                        Stream fileStream = File.OpenWrite(@"C:\Users\user\networks2\" + fileName);
+                        Stream fileStream = File.OpenWrite(@"C:\Users\Khaled\networks2\" + fileName);
                         while (true)
                         {
                             thisRead = networkStream.Read(dataByte, 0, blockSize);
@@ -205,7 +213,14 @@ namespace FileSendClient
                     byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                     int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                     string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
-               
+                if (!response.StartsWith("UNAUTH"))
+                {
+                    MessageBox.Show("Shutting Down...");
+                }
+                else
+                {
+                    MessageBox.Show("Please authorize first");
+                }
             }
             catch(Exception a)
             {
@@ -225,6 +240,14 @@ namespace FileSendClient
                 byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                 int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                 string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+                if (!response.StartsWith("UNAUTH"))
+                {
+                    MessageBox.Show("Logging off....");
+                }
+                else
+                {
+                    MessageBox.Show("Please authorize first");
+                }
             }
             catch(Exception w)
             {
@@ -243,6 +266,14 @@ namespace FileSendClient
                 byte[] bytesToRead = new byte[clientSocket.ReceiveBufferSize];
                 int bytesRead = networkStream.Read(bytesToRead, 0, clientSocket.ReceiveBufferSize);
                 string response = Encoding.ASCII.GetString(bytesToRead, 0, bytesRead);
+                if (!response.StartsWith("UNAUTH"))
+                {
+                    MessageBox.Show("Restarting....");
+                }
+                else
+                {
+                    MessageBox.Show("Please authorize first");
+                }
             }
             catch(Exception q)
             {
